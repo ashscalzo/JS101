@@ -8,7 +8,7 @@
     "result": "The result is ",
     "invalidNum": "Hmmm.... that doesn't look like a valid number.",
     "invalidOp": "Must choose 1, 2, 3, or 4:",
-    "continue": "Would you like to perform another calculation? (y/n)",
+    "continue": "Would you like to perform another calculation?\n=>(Press y to continue using calculator. Press any other key + Enter to exit.)",
     "thanks": "Thank you for using Calculator!",
     "yes": "y"
   },
@@ -20,7 +20,7 @@
     "result": "El resultado es ",
     "invalidNum": "Hmmm.... eso no parece un número válido.",
     "invalidOp": "Debe elegir 1, 2, 3 o 4:",
-    "continue": "¿Desea realizar otro cálculo? (s/n)",
+    "continue": "¿Desea realizar otro cálculo?\n=>Presione s para continuar usando Calculadora. Presione cualquier otra tecla + Enter para salir.",
     "thanks": "¡Gracias por usar Calculadora!",
     "yes": "s"
   }

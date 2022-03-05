@@ -31,8 +31,8 @@ switch (language) {
     language = 'en';
     break;
 }
-prompt(msg[language].welcome);   //Welcome to Calculator!
 
+prompt(msg[language].welcome);   //Welcome to Calculator!
 
 do {
   prompt(msg[language].firstNum); // first number
