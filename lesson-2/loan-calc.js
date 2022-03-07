@@ -9,9 +9,9 @@ function dollarsAndCents(amount) {
 }
 
 function invalidValue(value) {
-  return value.trimStart() === '' ||
-      Number.isNaN(Number(value)) ||
-      Number(value) <= 0;
+  return String(value).trimStart() === '' ||
+      Number.isNaN(value) ||
+      value <= 0;
 }
 
 let calcAgain;
@@ -28,35 +28,31 @@ do {
 
   do {
     say('Please enter the original total amount of your loan:');
-    loanAmt = readline.question();
+    loanAmt = Number(readline.question());
 
     while (invalidValue(loanAmt)) {
       say('Invalid value. Please enter the original total amount of your loan:');
-      loanAmt = readline.question();
+      loanAmt = Number(readline.question());
     }
 
-    loanAmt = Number(loanAmt);    //converted loanAmt to number
-
     say('Please enter the original term of your loan in years:');
-    duration = readline.question();
+    duration = Number(readline.question());
 
     while (invalidValue(duration)) {
       say('Invalid value. Please enter the original term of your loan in years:');
-      duration = readline.question();
+      duration = Number(readline.question());
     }
-
-    duration = Number(duration);    //converted duration to number
 
     say('Is your loan an interest-bearing loan? (Enter y if yes, or any other character if no.)');
     apr = readline.question().toLowerCase();
 
     if (apr === 'y') {
       say('What is the annual interest rate (APR) on your loan?');
-      apr = readline.question();
+      apr = Number(readline.question());
 
       while (invalidValue(apr)) {
         say('What is the annual interest rate (APR) on your loan?');
-        apr = readline.question();
+        apr = Number(readline.question());
       }
     } else {
       apr = null;
@@ -97,8 +93,3 @@ do {
 } while (calcAgain === 'y');
 
 say('Thank you for using LoanCalc!');
-
-/*
-[years, months]
-duration[0] * 12 + duration[1];
-*/
