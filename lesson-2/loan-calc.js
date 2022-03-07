@@ -9,11 +9,14 @@ function dollarsAndCents(amount) {
 }
 
 function invalidValue(value) {
-  return value.trimStart() === '' || Number.isNaN(Number(value));
+  return value.trimStart() === '' ||
+      Number.isNaN(Number(value)) ||
+      Number(value) <= 0;
 }
 
 let calcAgain;
 
+say('==============================================');
 say('Hello! Welcome to LoanCalc!');
 
 do {
@@ -74,17 +77,20 @@ do {
   let durationInMonths = duration * 12;
   let monthlyPmt;
 
-  if (apr) {
+  say('==============================================');
+
+  if (apr) {        // calculates monthly payment for interest-bearing loan
     monthlyPmt = loanAmt *
       (monthlyIntRate / (1 - ((1 + monthlyIntRate) ** (-durationInMonths))));
     let totalInt = (monthlyPmt * durationInMonths) - loanAmt;
     say(`Your installments for this loan will be $${dollarsAndCents(monthlyPmt)} per month.`);
     say(`The total amount of interest paid on this loan will be $${dollarsAndCents(totalInt)}.`);
-  } else {
+  } else {        // calculates monthly payment for no-interest loan
     monthlyPmt = loanAmt / durationInMonths;
     say(`Your installments for this loan will be $${dollarsAndCents(monthlyPmt)} per month.`);
   }
 
+  say('==============================================');
   say('Would you like to take a look at another loan?');
   say("Enter Y to calculate another loan's payments. Enter any other character to exit.");
   calcAgain = readline.question().toLowerCase();
