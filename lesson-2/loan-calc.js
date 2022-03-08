@@ -4,14 +4,58 @@ function say(message) {
   console.log(`=> ${message}`);
 }
 
-function dollarsAndCents(amount) {
-  return amount.toFixed(2);
+function getLoanAmt() {
+  say('Please enter the original total amount of your loan. (Do not include commas)');
+  return Number(readline.question());
 }
 
-function invalidValue(value) {
+function getDuration() {
+  say('Please enter the original term of your loan in years, as a whole number:');
+  return Number(readline.question());
+}
+
+function getAPR() {
+  say('What is the annual interest rate (APR) on your loan?');
+  return Number(readline.question());
+}
+
+function confirmLoanDets(amt, dur, apr) {
+  say('Great! So, just to confirm:');
+  if (apr) {
+    say(`Your original loan was for $${amt}, to be paid over ${dur} years at a ${apr}% annual rate?`);
+    say('Enter yes to confirm. Enter no to re-enter your information.');
+  } else {
+    say(`Your original loan was for $${amt}, to be paid over ${dur} years with no interest?`);
+    say('Enter yes to confirm. Enter no to re-enter your information.');
+  }
+  return readline.question().toLowerCase();
+}
+
+function calcMonthlyPmt(amt, months, rate) {
+  if (rate) {
+    return (amt *
+      (rate / (1 - ((1 + rate) ** (-months)))));
+  } else {
+    return amt / months;
+  }
+}
+
+function invalidNum(value) {
   return String(value).trimStart() === '' ||
       Number.isNaN(value) ||
       value <= 0;
+}
+
+function invalidAnswer(answer) {
+  return answer.toLowerCase() !== 'yes' &&
+      answer.toLowerCase() !== 'y' &&
+      answer.toLowerCase() !== 'no' &&
+      answer.toLowerCase() !== 'n';
+}
+
+function resetCalc() {
+  say('Would you like to take a look at another loan?');
+  return readline.question().toLowerCase();
 }
 
 let calcAgain;
@@ -19,7 +63,7 @@ let calcAgain;
 say('==============================================');
 say('Hello! Welcome to LoanCalc!');
 
-do {
+while (true) {
 
   let loanAmt;
   let duration;
@@ -27,69 +71,66 @@ do {
   let confirm;
 
   do {
-    say('Please enter the original total amount of your loan:');
-    loanAmt = Number(readline.question());
-
-    while (invalidValue(loanAmt)) {
-      say('Invalid value. Please enter the original total amount of your loan:');
-      loanAmt = Number(readline.question());
+    loanAmt = getLoanAmt();
+    while (invalidNum(loanAmt)) {
+      loanAmt = getLoanAmt();
     }
 
-    say('Please enter the original term of your loan in years:');
-    duration = Number(readline.question());
-
-    while (invalidValue(duration)) {
-      say('Invalid value. Please enter the original term of your loan in years:');
-      duration = Number(readline.question());
+    duration = getDuration();
+    while (invalidNum(duration) || !Number.isInteger(duration)) {
+      duration = getDuration();
     }
 
-    say('Is your loan an interest-bearing loan? (Enter y if yes, or any other character if no.)');
+    say('Is your loan an interest-bearing loan? (Enter yes or no.)');
     apr = readline.question().toLowerCase();
 
-    if (apr === 'y') {
-      say('What is the annual interest rate (APR) on your loan?');
-      apr = Number(readline.question());
+    while (invalidAnswer(apr)) {
+      say('Invalid response. Please enter yes or no.');
+      apr = readline.question().toLowerCase();
+    }
 
-      while (invalidValue(apr)) {
-        say('What is the annual interest rate (APR) on your loan?');
-        apr = Number(readline.question());
+    if (apr === 'yes') {
+      apr = getAPR();
+      while (invalidNum(apr)) {
+        apr = getAPR();
       }
-    } else {
+    } else if (apr === 'no') {
       apr = null;
     }
 
-    say('Great! So, just to confirm:');
-    if (apr) {
-      say(`Your original loan was for $${loanAmt}, to be paid over ${duration} years at a ${apr}% annual rate?`);
-      say('Enter Y to confirm. Enter any other character to re-enter your information.');
-    } else {
-      say(`Your original loan was for $${loanAmt}, to be paid over ${duration} years with no interest?`);
-      say('Enter Y to confirm. Enter any other character to re-enter your information.');
+    confirm = confirmLoanDets(loanAmt, duration, apr);
+    while (invalidAnswer(confirm)) {
+      say('Invalid response. Please enter yes to continue, or no to re-enter your information.');
+      confirm = readline.question().toLowerCase();
     }
-    confirm = readline.question().toLowerCase();
-  } while (confirm !== 'y');
+
+  } while (confirm === 'no' || confirm === 'n');
 
   let monthlyIntRate = (apr / 100) / 12;
   let durationInMonths = duration * 12;
-  let monthlyPmt;
+  let monthlyPmt = calcMonthlyPmt(loanAmt, durationInMonths, monthlyIntRate);
+  let totalInt = (monthlyPmt * durationInMonths) - loanAmt;
 
   say('==============================================');
 
-  if (apr) {        // calculates monthly payment for interest-bearing loan
-    monthlyPmt = loanAmt *
-      (monthlyIntRate / (1 - ((1 + monthlyIntRate) ** (-durationInMonths))));
-    let totalInt = (monthlyPmt * durationInMonths) - loanAmt;
-    say(`Your installments for this loan will be $${dollarsAndCents(monthlyPmt)} per month.`);
-    say(`The total amount of interest paid on this loan will be $${dollarsAndCents(totalInt)}.`);
-  } else {        // calculates monthly payment for no-interest loan
-    monthlyPmt = loanAmt / durationInMonths;
-    say(`Your installments for this loan will be $${dollarsAndCents(monthlyPmt)} per month.`);
+  if (apr) {
+    say(`Your installments for this loan will be $${monthlyPmt.toFixed(2)} per month.`);
+    say(`The total amount of interest paid on this loan will be $${totalInt.toFixed(2)}.`);
+  } else {
+    say(`Your installments for this loan will be $${monthlyPmt.toFixed(2)} per month.`);
   }
 
   say('==============================================');
-  say('Would you like to take a look at another loan?');
-  say("Enter Y to calculate another loan's payments. Enter any other character to exit.");
-  calcAgain = readline.question().toLowerCase();
-} while (calcAgain === 'y');
+
+  calcAgain = resetCalc();
+  if (calcAgain === 'yes' || calcAgain === 'y') {
+    console.clear();
+  }
+
+  if (calcAgain === 'n' || calcAgain === 'no') {
+    break;
+  }
+}
+
 
 say('Thank you for using LoanCalc!');
