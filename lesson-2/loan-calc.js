@@ -89,12 +89,12 @@ while (true) {
       apr = readline.question().toLowerCase();
     }
 
-    if (apr === 'yes') {
+    if (apr === 'yes' || apr === 'y') {
       apr = getAPR();
       while (invalidNum(apr)) {
         apr = getAPR();
       }
-    } else if (apr === 'no') {
+    } else if (apr === 'no' || apr === 'n') {
       apr = null;
     }
 
