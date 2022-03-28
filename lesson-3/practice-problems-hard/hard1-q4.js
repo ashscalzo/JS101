@@ -54,3 +54,4 @@ console.log(isDotSeparatedIpAddress('1.2.3.4.5'));
 console.log(isDotSeparatedIpAddress('4.5.5'));
 console.log(isDotSeparatedIpAddress('10.4.5.11'));
 console.log(isDotSeparatedIpAddress('1.2.300.4.5'));
+
