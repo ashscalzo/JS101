@@ -1,0 +1,24 @@
+// For each of these collection objects,
+// demonstrate how you would access the letter g.
+
+let arr1 = ['a', 'b', ['c', ['d', 'e', 'f', 'g']]];
+let answer1 = arr1[2][1][3];
+
+let arr2 = [{ first: ['a', 'b', 'c'], second: ['d', 'e', 'f'] }, { third: ['g', 'h', 'i'] }];
+let answer2 = arr2[1].third[0];
+
+let arr3 = [['abc'], ['def'], { third: ['ghi'] }];
+let answer3 = arr3[2]['third'][0][0];
+
+let obj1 = { a: ['d', 'e'], b: ['f', 'g'], c: ['h', 'i'] };
+let answer4 = Object.values(obj1)[1][1];
+
+let obj2 = { first: { d: 3 }, second: { e: 2, f: 1 }, third: { g: 0 }};
+let answer5 = Object.keys(obj2.third)[0];
+
+
+console.log(answer1);
+console.log(answer2);
+console.log(answer3);
+console.log(answer4);
+console.log(answer5);
