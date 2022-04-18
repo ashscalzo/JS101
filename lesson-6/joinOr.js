@@ -1,4 +1,5 @@
 /*  joinOr function to be added to tic-tac-toe.js
+PEDAC:
 Problem
 write a function joinOr that takes an array and returns a string of the elements
 separated by a punctuation (if >2 elements) using .join format
@@ -28,8 +29,18 @@ Algorithm
   separate the last element from the others
     assign to a separate variable
   join the remaining variables with the specified punctuation
-  join the string with all of the elements to the string with the last element
-    add the conjunction before the last element (use interpolation maybe?)
+    if no punctuation is specified, default is a comma (see test case #1)
+  join the last element to the string (interpolation or concatenation)
+    second-to-last element should have punctuation after it, before last element
+    if no conjunction specified, default is 'or' (see test case #1)
+  if the array is empty => output should be empty string
+  if the array has 1 element => output should be string of that element
+  if array has 2 elements => output should be string of elements separated by
+    conjunction
+    no punctuation
+  if array has 3 or more elements => output should be a string:
+    list the elements, separated by punctuation
+    conjunction should be in front of the last element, after punctuation
   return the final string
 */
 
