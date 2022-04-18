@@ -15,7 +15,7 @@ const readline = require('readline-sync');
 const INITIAL_MARKER = '  ';
 const HUMAN_MARKER = '❌';
 const COMPUTER_MARKER = '⭕️';
-const WINNING_POINTS = 3;
+// const WINNING_POINTS = 3;
 
 function prompt(message) {
   console.log(`=> ${message}`);
@@ -129,7 +129,6 @@ function detectWinner(board) {
 
 
 prompt('Welcome to Tic-Tac-Toe!');
-// prompt('First to win three out of five rounds is the winner!');
 
 while (true) {
   let board = initializeBoard();
