@@ -15,7 +15,8 @@ const readline = require('readline-sync');
 const INITIAL_MARKER = '  ';
 const HUMAN_MARKER = '❌';
 const COMPUTER_MARKER = '⭕️';
-// const WINNING_POINTS = 3;
+const WINNING_POINTS = 3;
+let currentScore = [0, 0];
 
 function prompt(message) {
   console.log(`=> ${message}`);
