@@ -15,15 +15,19 @@ const readline = require('readline-sync');
 const INITIAL_MARKER = '  ';
 const HUMAN_MARKER = '❌';
 const COMPUTER_MARKER = '⭕️';
+const WINNING_LINES = [
+  [1, 2, 3], [4, 5, 6], [7, 8, 9],    // rows
+  [1, 4, 7], [2, 5, 8], [3, 6, 9],    // columns
+  [1, 5, 9], [3, 5, 7]                // diagonals
+];
 const WINNING_POINTS = 3;
-let currentScore = [0, 0];
 
 function prompt(message) {
   console.log(`=> ${message}`);
 }
 
 function displayBoard(board) {
-  console.clear();
+  // console.clear();
 
   console.log(`You are ${HUMAN_MARKER}. Computer is ${COMPUTER_MARKER}.`);
 
@@ -99,14 +103,9 @@ function someoneWon(board) {
 }
 
 function detectWinner(board) {
-  let winningLines = [
-    [1, 2, 3], [4, 5, 6], [7, 8, 9],    // rows
-    [1, 4, 7], [2, 5, 8], [3, 6, 9],    // columns
-    [1, 5, 9], [3, 5, 7]                // diagonals
-  ];
+  for (let line = 0; line < WINNING_LINES.length; line += 1) {
+    let [sq1, sq2, sq3] = WINNING_LINES[line];
 
-  for (let line = 0; line < winningLines.length; line += 1) {
-    let [sq1, sq2, sq3] = winningLines[line];
     if (
       board[sq1] === HUMAN_MARKER &&
       board[sq2] === HUMAN_MARKER &&
@@ -121,46 +120,54 @@ function detectWinner(board) {
       return 'Computer';
     }
   }
+
   return null;
 }
 
-// function displayPointCount(player1, player2) {
-//   prompt(`Player: ${player1} | Computer: ${player2}`);
-// }
+function displayScore(score) {
+  prompt(`Player has ${score[0]} point(s). Computer has ${score[1]} point(s).`);
+}
 
-
-prompt('Welcome to Tic-Tac-Toe!');
+prompt('Welcome to Tic-Tac-Toe! First to 3 points wins!');
 
 while (true) {
-  let board = initializeBoard();
-  // let playerPoints = 0;
-  // let computerPoints = 0;
+  let currentScore = [0, 0];        // index 0 is player points, index 1 is comp points
 
-  while (true) {
-    displayBoard(board);
+  while (currentScore[0] < WINNING_POINTS && currentScore[1] < WINNING_POINTS) {
+    console.clear();
+    let board = initializeBoard();
 
-    playerChoosesSquare(board);
-    if (someoneWon(board) || boardFull(board)) break;
+    while (true) {
+      displayBoard(board);
+      displayScore(currentScore);
 
-    computerChoosesSquare(board);
-    if (someoneWon(board) || boardFull(board)) break;
+      playerChoosesSquare(board);
+      if (someoneWon(board) || boardFull(board)) break;
+
+      computerChoosesSquare(board);
+      if (someoneWon(board) || boardFull(board)) break;
+    }
+
+    if (someoneWon(board)) {
+      prompt(`${detectWinner(board)} won round!`);
+      if (detectWinner(board) === 'Player') {
+        currentScore[0] += 1;   // adds point for player
+      } else if (detectWinner(board) === 'Computer') {
+        currentScore[1] += 1;   // adds point for computer
+      }
+    } else {
+      prompt("It's a tie!");
+    }
+
   }
 
-  displayBoard(board);
-
-  if (someoneWon(board)) {
-    prompt(`${detectWinner(board)} won!`);
-  } else {
-    prompt("It's a tie!");
+  if (currentScore[0] === WINNING_POINTS) {
+    prompt('Player won!');
+  } else if (currentScore[1] === WINNING_POINTS) {
+    prompt('Computer won!');
   }
 
-  // if (detectWinner(board).toLowerCase() === 'player') {
-  //   playerPoints += 1;
-  // } else if (detectWinner(board).toLowerCase() === 'computer') {
-  //   computerPoints += 1;
-  // }
-
-  // displayPointCount(playerPoints, computerPoints);
+  prompt(`Final Score - Player: ${currentScore[0]} / Computer: ${currentScore[1]}`);
 
   prompt('Play again? (y / n)');
   let answer = readline.question().toLowerCase();
@@ -169,7 +176,9 @@ while (true) {
     answer = readline.question().toLowerCase();
   }
 
-  if (answer !== 'y') break;
+  if (answer === 'y') {
+    currentScore = [0, 0];
+  } else if (answer !== 'y') break;
 }
 
 prompt('Thanks for playing!');
