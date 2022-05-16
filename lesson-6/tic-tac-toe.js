@@ -148,8 +148,9 @@ while (true) {
       if (someoneWon(board) || boardFull(board)) break;
     }
 
+    displayBoard(board);
+
     if (someoneWon(board)) {
-      prompt(`${detectWinner(board)} won round!`);
       if (detectWinner(board) === 'Player') {
         currentScore[0] += 1;   // adds point for player
       } else if (detectWinner(board) === 'Computer') {
