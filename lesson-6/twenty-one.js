@@ -45,20 +45,21 @@ user input hit/stay
 
 const readline = require('readline-sync');
 
-const DECK_OF_CARDS = {
-  hearts: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
-  diamonds: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
-  clubs: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
-  spades: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
-};
-
-
 function prompt(msg) {
   console.log(`=> ${msg}`);
 }
 
+function initializeDeck() {
+  return {
+    hearts: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
+    diamonds: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
+    clubs: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
+    spades: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
+  };
+}
+
 function dealCard(deck) {
-  let suits = Object.keys(DECK_OF_CARDS);     // allows us to access suits in object
+  let suits = Object.keys(deck);     // allows us to access suits in object
   let randomSuit = suits[Math.floor(Math.random() * suits.length)];
   let randomCard = Math.floor(Math.random() * deck[randomSuit].length);
   let card = deck[randomSuit].splice(randomCard, 1);    //removes the dealt card from the available deck
@@ -70,45 +71,63 @@ function hitOrStay() {
   return readline.question().toLowerCase();
 }
 
-// function displayHand(hand) {
-
-// }
-
-function addTotal(hand, total) {
-  for (let card = 0; card < hand.length; card += 1) {
-    // convert face cards to respective values
+function displayHand(hand) {
+  if (hand.length === 2) {
+    return hand.join(` and `);
+  } else if (hand.length > 2) {
+    let finalCard = hand.pop();
+    return `${hand.join(', ')}, and ${finalCard}`;
   }
-  return hand.reduce(
-    (accumulator, element) => accumulator + element,
-    total
-  );
+}
+
+function addTotal(hand) {
+  let total = 0;
+  hand.forEach(value => {
+    if (value === 'A') {
+      total += 11;
+    } else if (['J', 'Q', 'K'].includes(value)) {
+      total += 10;
+    } else {
+      total += value;
+    }
+  });
+
+  hand.filter(value => value === 'A').forEach(_ => {
+    if (total > 21) total -= 10;
+  });
+
+  return total;
 }
 
 while (true) {
-  let playerTotal = 0;
-  let dealerTotal = 0;
+  let deckOfCards = initializeDeck();
+
   let playerHand = [];
   let dealerHand = [];
+  let playerTotal;
+  let dealerTotal;
 
   prompt('Welcome to Twenty-One!');
 
-  playerHand.push(dealCard(DECK_OF_CARDS));
-  dealerHand.push(dealCard(DECK_OF_CARDS));
-  playerHand.push(dealCard(DECK_OF_CARDS));
-  dealerHand.push(dealCard(DECK_OF_CARDS));
+  playerHand.push(dealCard(deckOfCards));
+  dealerHand.push(dealCard(deckOfCards));
+  playerHand.push(dealCard(deckOfCards));
+  dealerHand.push(dealCard(deckOfCards));
 
   while (true) {
-    prompt(`Your cards are ${playerHand[0]} and ${playerHand[1]}.`);
-    prompt(`Dealer's cards are [unknown] and ${dealerHand[1]}.`);
+    playerTotal = addTotal(playerHand);
 
-    playerTotal = addTotal(playerHand, playerTotal);
-    dealerTotal = addTotal(dealerHand, dealerTotal);
+    prompt(`Your cards are ${displayHand(playerHand)}.`);
+    prompt(`Dealer's cards are [unknown] and ${dealerHand[1]}.`);
+    prompt(`Player total: ${playerTotal}`);
+
+    if (playerTotal >= 21) break;
 
     let answer = hitOrStay();
 
     if (answer === 'hit') {
       prompt('Player chose to hit!');
-      playerHand.push(dealCard(DECK_OF_CARDS));
+      playerHand.push(dealCard(deckOfCards));
     } else if (answer === 'stay') {
       prompt('Player chose to stay.');
       break;
@@ -117,4 +136,15 @@ while (true) {
       answer = hitOrStay();
     }
   }
+
+  if (playerTotal === 21) {
+    prompt('21! Player wins!');
+    break;
+  } else if (playerTotal > 21) {
+    prompt('Bust! You lose!');
+    break;
+  }
+
 }
+
+prompt('Thanks for playing!');
