@@ -29,7 +29,7 @@ account for that.
 */
 
 /*
-declare constant DECK_OF_CARDS
+declare constant DECK_OF_CARDS      => function to initialize deck
   object
 
 use Math.random to determine which cards are drawn and given to player/dealer
@@ -37,10 +37,13 @@ use Math.random to determine which cards are drawn and given to player/dealer
   randomize the suit, then the card chosen
     number cards have face value; J, Q, and K are worth 10; A can be 1 OR 11!!!
       account for multiple aces; when will they count as 1 vs 11?
-
-user input hit/stay
-  create a way to account for invalid input
-
+player's turn, chooses hit or stay
+  user input hit/stay
+    create a way to account for invalid input
+  continues until player busts or stays
+dealer should hit until total >= 17
+if dealer busts, player wins; if player busts, dealer wins
+compare cards and declare winner
 */
 
 const readline = require('readline-sync');
@@ -72,12 +75,15 @@ function hitOrStay() {
 }
 
 function displayHand(hand) {
+  let listOfCards = '';
   if (hand.length === 2) {
-    return hand.join(` and `);
+    listOfCards += hand.join(` and `);
   } else if (hand.length > 2) {
-    let finalCard = hand.pop();
-    return `${hand.join(', ')}, and ${finalCard}`;
+    let handMinusOne = hand.slice(0, hand.length - 1);
+    let finalCard = hand[hand.length - 1];
+    listOfCards += handMinusOne.join(', ') + `, and ${finalCard}`;
   }
+  return listOfCards;
 }
 
 function addTotal(hand) {
@@ -99,6 +105,51 @@ function addTotal(hand) {
   return total;
 }
 
+function displayFinalScore(player, dealer) {
+  prompt(`Player's final hand: ${displayHand(player)}
+      Total: ${addTotal(player)}`);
+  prompt(`Dealer's final hand: ${displayHand(dealer)}
+      Total: ${addTotal(dealer)}`);
+}
+
+function detectWinner(player, dealer) {
+  if (player === 21 ||
+    ((dealer > 21 || player > dealer) && player < 21)) {
+    return 'player';
+  } else if (player === dealer) {
+    return 'tie';
+  } else {
+    return 'dealer';
+  }
+}
+
+function busted(handTotal) {
+  if (handTotal > 21) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function displayWinner(winner) {
+  switch (winner) {
+    case 'player':
+      prompt('Player wins!');
+      break;
+    case 'dealer':
+      prompt('Dealer wins!');
+      break;
+    default:
+      prompt("It's a tie!");
+      break;
+  }
+}
+
+function playAgain() {
+  prompt ('Would you like to play again? Enter y or n:');
+  return readline.question().toLowerCase();
+}
+
 while (true) {
   let deckOfCards = initializeDeck();
 
@@ -116,35 +167,58 @@ while (true) {
 
   while (true) {
     playerTotal = addTotal(playerHand);
+    dealerTotal = addTotal(dealerHand);
 
     prompt(`Your cards are ${displayHand(playerHand)}.`);
     prompt(`Dealer's cards are [unknown] and ${dealerHand[1]}.`);
     prompt(`Player total: ${playerTotal}`);
 
-    if (playerTotal >= 21) break;
+    if (playerTotal >= 21 || dealerTotal === 21) break;
 
     let answer = hitOrStay();
+    while (answer !== 'hit' && answer !== 'stay') {
+      prompt('Invalid input. Would you like to hit or stay?');
+      answer = readline.question();
+    }
 
     if (answer === 'hit') {
       prompt('Player chose to hit!');
       playerHand.push(dealCard(deckOfCards));
+      playerTotal = addTotal(playerHand);
+      if (playerTotal >= 21) break;
     } else if (answer === 'stay') {
       prompt('Player chose to stay.');
       break;
-    } else {
-      prompt('Invalid input. Would you like to hit or stay?');
-      answer = hitOrStay();
     }
   }
 
-  if (playerTotal === 21) {
-    prompt('21! Player wins!');
-    break;
-  } else if (playerTotal > 21) {
-    prompt('Bust! You lose!');
-    break;
+  if (playerTotal < 21) {
+    while (dealerTotal < 17) {
+      prompt('Dealer hit!');
+      dealerHand.push(dealCard(deckOfCards));
+      dealerTotal = addTotal(dealerHand);
+    }
   }
 
+  if (busted(playerTotal)) {
+    prompt('Player busted!');
+  } else if (busted(dealerTotal)) {
+    prompt('Dealer busted!');
+  }
+
+  displayFinalScore(playerHand, dealerHand);
+
+  let winner = detectWinner(playerTotal, dealerTotal);
+  displayWinner(winner);
+
+  let newGame = playAgain();
+
+  while (newGame !== 'y' && newGame !== 'n') {
+    prompt('Invalid input. Please enter y or n');
+    newGame = readline.question();
+  }
+
+  if (newGame === 'n') break;
 }
 
 prompt('Thanks for playing!');
