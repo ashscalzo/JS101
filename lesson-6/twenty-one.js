@@ -188,7 +188,6 @@ while (true) {
       }
     }
 
-
     if (busted(playerTotal)) {
       prompt('Player busted!');
     } else if (playerTotal < POINT_LIMIT) {
@@ -231,7 +230,6 @@ while (true) {
   }
 
   if (newGame === 'n' || newGame === 'no') break;
-
 }
 
 prompt('Thanks for playing!');
