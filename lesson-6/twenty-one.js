@@ -9,8 +9,6 @@ function prompt(msg) {
 }
 
 function initializeDeck() {
-  console.clear();
-
   return {
     hearts: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
     diamonds: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'],
@@ -75,18 +73,19 @@ function busted(handTotal) {
   }
 }
 
-function displayRoundScore(player, dealer) {
-  prompt(`Player's final hand: ${displayHand(player)}
-      Total: ${addTotal(player)}`);
-  prompt(`Dealer's final hand: ${displayHand(dealer)}
-      Total: ${addTotal(dealer)}`);
+function displayRoundScore(playerHand, dealerHand) {
+  prompt(`Player's final hand: ${displayHand(playerHand)}
+      Total: ${addTotal(playerHand)}`);
+  prompt(`Dealer's final hand: ${displayHand(dealerHand)}
+      Total: ${addTotal(dealerHand)}`);
 }
 
-function detectRoundWinner(player, dealer) {
-  if (player === POINT_LIMIT ||
-    ((dealer > POINT_LIMIT || player > dealer) && player < POINT_LIMIT)) {
+function detectRoundWinner(playerPoints, dealerPoints) {
+  if (playerPoints === POINT_LIMIT ||
+    ((dealerPoints > POINT_LIMIT || playerPoints > dealerPoints) &&
+      playerPoints < POINT_LIMIT)) {
     return 'player';
-  } else if (player === dealer) {
+  } else if (playerPoints === dealerPoints) {
     return 'tie';
   } else {
     return 'dealer';
@@ -94,9 +93,9 @@ function detectRoundWinner(player, dealer) {
 }
 
 function detectGrandWinner() {
-  if (totalScore[0] === 3) {
+  if (totalScore[0] === WINNING_ROUNDS) {
     return 'player';
-  } else if (totalScore[1] === 3) {
+  } else if (totalScore[1] === WINNING_ROUNDS) {
     return 'dealer';
   } else {
     return null;
@@ -150,6 +149,7 @@ while (true) {
   let dealerTotal;
 
   while (totalScore[0] < WINNING_ROUNDS && totalScore[1] < WINNING_ROUNDS) {
+    console.clear();
     let deckOfCards = initializeDeck();
 
     let playerHand = [];
@@ -166,17 +166,16 @@ while (true) {
     while (true) {
       playerTotal = addTotal(playerHand);
       dealerTotal = addTotal(dealerHand);
-      if (playerTotal >= POINT_LIMIT) break;
+
+      // if (playerTotal >= POINT_LIMIT || dealerTotal === POINT_LIMIT) break;
 
       prompt(`Your cards are ${displayHand(playerHand)}.`);
       prompt(`Dealer's cards are [unknown] and ${dealerHand[1]}.`);
       prompt(`Player total: ${playerTotal}`);
 
-      if (playerTotal >= POINT_LIMIT || dealerTotal === POINT_LIMIT) break;
-
       let answer = hitOrStay();
       while (answer !== 'hit' && answer !== 'stay') {
-        prompt('Invalid input. Would you like to hit or stay?');
+        prompt('Invalid input. Would you like to "hit" or "stay"?');
         answer = readline.question();
       }
 
@@ -188,9 +187,14 @@ while (true) {
         prompt('Player chose to stay.');
         break;
       }
+
+      if (busted(playerTotal) || dealerTotal === POINT_LIMIT) break;
     }
 
-    if (playerTotal < POINT_LIMIT) {
+
+    if (busted(playerTotal)) {
+      prompt('Player busted!');
+    } else if (playerTotal < POINT_LIMIT) {
       while (dealerTotal < DEALER_HIT_LIMIT) {
         prompt('Dealer hit!');
         dealerHand.push(dealCard(deckOfCards));
@@ -198,9 +202,7 @@ while (true) {
       }
     }
 
-    if (busted(playerTotal)) {
-      prompt('Player busted!');
-    } else if (busted(dealerTotal)) {
+    if (busted(dealerTotal)) {
       prompt('Dealer busted!');
     }
 
