@@ -167,7 +167,7 @@ while (true) {
       playerTotal = addTotal(playerHand);
       dealerTotal = addTotal(dealerHand);
 
-      // if (playerTotal >= POINT_LIMIT || dealerTotal === POINT_LIMIT) break;
+      if (playerTotal >= POINT_LIMIT || dealerTotal === POINT_LIMIT) break;
 
       prompt(`Your cards are ${displayHand(playerHand)}.`);
       prompt(`Dealer's cards are [unknown] and ${dealerHand[1]}.`);
@@ -182,13 +182,10 @@ while (true) {
       if (answer === 'hit') {
         prompt('Player chose to hit!');
         playerHand.push(dealCard(deckOfCards));
-        playerTotal = addTotal(playerHand);
       } else if (answer === 'stay') {
         prompt('Player chose to stay.');
         break;
       }
-
-      if (busted(playerTotal) || dealerTotal === POINT_LIMIT) break;
     }
 
 
