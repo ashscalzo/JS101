@@ -160,7 +160,7 @@ function keepScore(winner) {
 function playAgain() {
   playerScore = 0;
   dealerScore = 0;
-  
+
   prompt('Would you like to play again? Enter y or n:');
   let newGame = readline.question().toLowerCase();
   while (newGame !== 'y' &&
@@ -170,8 +170,8 @@ function playAgain() {
     prompt('Invalid input. Please enter y or n:');
     newGame = readline.question();
   }
- 
-  if (newGame === 'n' || newGame === 'no') break;
+
+  return newGame;
 }
 
 while (true) {
