@@ -1,8 +1,11 @@
 const readline = require('readline-sync');
-let totalScore = [0, 0];        // index 0 is player points, index 1 is dealer points
 const WINNING_ROUNDS = 3;       // number of won rounds needed to win game
 const DEALER_HIT_LIMIT = 17;    // number needed for dealer to stay
 const POINT_LIMIT = 21;         // max number of points before a player busts
+const ACE_VALUE = 11;
+const FACE_CARD_VALUE = 10;
+let playerScore = 0;
+let dealerScore = 0;
 
 function prompt(msg) {
   console.log(`=> ${msg}`);
@@ -22,7 +25,23 @@ function dealCard(deck) {
   let randomSuit = suits[Math.floor(Math.random() * suits.length)];
   let randomCard = Math.floor(Math.random() * deck[randomSuit].length);
   let card = deck[randomSuit].splice(randomCard, 1);    //removes the dealt card from the available deck
-  return card[0];
+  if (randomSuit === 'hearts') {
+    card.unshift('♥️');
+  } else if (randomSuit === 'diamonds') {
+    card.unshift('♦️');
+  } else if (randomSuit === 'clubs') {
+    card.unshift('♣️');
+  } else if (randomSuit === 'spades') {
+    card.unshift('♠️');
+  }
+  return card;
+}
+
+function initialDeal(deck, playerHand, dealerHand) {
+  playerHand.push(dealCard(deck));
+  dealerHand.push(dealCard(deck));
+  playerHand.push(dealCard(deck));
+  dealerHand.push(dealCard(deck));
 }
 
 function hitOrStay() {
@@ -34,11 +53,14 @@ function displayHand(hand) {
   let listOfCards = '';
 
   if (hand.length === 2) {
-    listOfCards += hand.join(` and `);
+    listOfCards += `${hand[0].join('')} and ${hand[1].join('')}`;
   } else if (hand.length > 2) {
     let handMinusOne = hand.slice(0, hand.length - 1);
-    let finalCard = hand[hand.length - 1];
-    listOfCards += handMinusOne.join(', ') + `, and ${finalCard}`;
+    handMinusOne.forEach(card => {
+      listOfCards += `${card.join('')}, `;
+    });
+    let finalCard = hand[hand.length - 1].join('');
+    listOfCards += `and ${finalCard}`;
   }
 
   return listOfCards;
@@ -47,13 +69,13 @@ function displayHand(hand) {
 function addTotal(hand) {
   let total = 0;
 
-  hand.forEach(value => {
-    if (value === 'A') {
-      total += 11;
-    } else if (['J', 'Q', 'K'].includes(value)) {
-      total += 10;
+  hand.forEach(card => {
+    if (card[1] === 'A') {
+      total += ACE_VALUE;
+    } else if (['J', 'Q', 'K'].includes(card[1])) {
+      total += FACE_CARD_VALUE;
     } else {
-      total += value;
+      total += card[1];
     }
   });
 
@@ -66,11 +88,7 @@ function addTotal(hand) {
 
 
 function busted(handTotal) {
-  if (handTotal > POINT_LIMIT) {
-    return true;
-  } else {
-    return false;
-  }
+  return handTotal > POINT_LIMIT;
 }
 
 function displayRoundScore(playerHand, dealerHand) {
@@ -93,9 +111,9 @@ function detectRoundWinner(playerPoints, dealerPoints) {
 }
 
 function detectGrandWinner() {
-  if (totalScore[0] === WINNING_ROUNDS) {
+  if (playerScore === WINNING_ROUNDS) {
     return 'player';
-  } else if (totalScore[1] === WINNING_ROUNDS) {
+  } else if (dealerScore === WINNING_ROUNDS) {
     return 'dealer';
   } else {
     return null;
@@ -127,28 +145,40 @@ function displayGrandWinner(winner) {
   }
 
   prompt(`Final Score:
-          Player - ${totalScore[0]} points
-          Dealer - ${totalScore[1]} points`);
+          Player - ${playerScore} points
+          Dealer - ${dealerScore} points`);
 }
 
 function keepScore(winner) {
   if (winner === 'player') {
-    totalScore[0] += 1;
+    playerScore += 1;
   } else if (winner === 'dealer') {
-    totalScore[1] += 1;
+    dealerScore += 1;
   }
 }
 
 function playAgain() {
-  prompt ('Would you like to play again? Enter y or n:');
-  return readline.question().toLowerCase();
+  playerScore = 0;
+  dealerScore = 0;
+  
+  prompt('Would you like to play again? Enter y or n:');
+  let newGame = readline.question().toLowerCase();
+  while (newGame !== 'y' &&
+         newGame !== 'yes' &&
+         newGame !== 'n' &&
+         newGame !== 'no') {
+    prompt('Invalid input. Please enter y or n:');
+    newGame = readline.question();
+  }
+ 
+  if (newGame === 'n' || newGame === 'no') break;
 }
 
 while (true) {
   let playerTotal;
   let dealerTotal;
 
-  while (totalScore[0] < WINNING_ROUNDS && totalScore[1] < WINNING_ROUNDS) {
+  while (playerScore < WINNING_ROUNDS && dealerScore < WINNING_ROUNDS) {
     console.clear();
     let deckOfCards = initializeDeck();
 
@@ -158,10 +188,7 @@ while (true) {
     prompt('Welcome to Twenty-One!');
     prompt(`First to ${WINNING_ROUNDS} points is the grand winner!`);
 
-    playerHand.push(dealCard(deckOfCards));
-    dealerHand.push(dealCard(deckOfCards));
-    playerHand.push(dealCard(deckOfCards));
-    dealerHand.push(dealCard(deckOfCards));
+    initialDeal(deckOfCards, playerHand, dealerHand);
 
     while (true) {
       playerTotal = addTotal(playerHand);
@@ -170,19 +197,22 @@ while (true) {
       if (playerTotal >= POINT_LIMIT || dealerTotal === POINT_LIMIT) break;
 
       prompt(`Your cards are ${displayHand(playerHand)}.`);
-      prompt(`Dealer's cards are [unknown] and ${dealerHand[1]}.`);
+      prompt(`Dealer's cards are [unknown] and ${dealerHand[1].join('')}.`);
       prompt(`Player total: ${playerTotal}`);
 
       let answer = hitOrStay();
-      while (answer !== 'hit' && answer !== 'stay') {
+      while (answer !== 'hit' &&
+             answer !== 'h' &&
+             answer !== 'stay' &&
+             answer !== 's') {
         prompt('Invalid input. Would you like to "hit" or "stay"?');
         answer = readline.question();
       }
 
-      if (answer === 'hit') {
+      if (answer === 'hit' || answer === 'h') {
         prompt('Player chose to hit!');
         playerHand.push(dealCard(deckOfCards));
-      } else if (answer === 'stay') {
+      } else if (answer === 'stay' || answer === 's') {
         prompt('Player chose to stay.');
         break;
       }
@@ -208,7 +238,7 @@ while (true) {
     keepScore(winner);
     displayRoundWinner(winner);
 
-    prompt('Enter any character to proceed.');
+    prompt('Press Enter/Return to proceed.');
     readline.question();
   }
 
@@ -219,15 +249,16 @@ while (true) {
   displayGrandWinner(grandWinner);
 
   let newGame = playAgain();
-  totalScore = [0, 0];
+  // playerScore = 0;
+  // dealerScore = 0;
 
-  while (newGame !== 'y' &&
-         newGame !== 'yes' &&
-         newGame !== 'n' &&
-         newGame !== 'no') {
-    prompt('Invalid input. Please enter y or n:');
-    newGame = readline.question();
-  }
+  // while (newGame !== 'y' &&
+  //        newGame !== 'yes' &&
+  //        newGame !== 'n' &&
+  //        newGame !== 'no') {
+  //   prompt('Invalid input. Please enter y or n:');
+  //   newGame = readline.question();
+  // }
 
   if (newGame === 'n' || newGame === 'no') break;
 }
