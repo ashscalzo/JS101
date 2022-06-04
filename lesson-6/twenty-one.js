@@ -20,7 +20,7 @@ function initializeDeck() {
   };
 }
 
-function dealCard(deck) {
+function dealCard(deck, hand) {
   let suits = Object.keys(deck);     // allows us to access suits in object
   let randomSuit = suits[Math.floor(Math.random() * suits.length)];
   let randomCard = Math.floor(Math.random() * deck[randomSuit].length);
@@ -34,14 +34,14 @@ function dealCard(deck) {
   } else if (randomSuit === 'spades') {
     card.unshift('♠️');
   }
-  return card;
+  hand.push(card);
 }
 
 function initialDeal(deck, playerHand, dealerHand) {
-  playerHand.push(dealCard(deck));
-  dealerHand.push(dealCard(deck));
-  playerHand.push(dealCard(deck));
-  dealerHand.push(dealCard(deck));
+  dealCard(deck, playerHand);
+  dealCard(deck, dealerHand);
+  dealCard(deck, playerHand);
+  dealCard(deck, dealerHand);
 }
 
 function hitOrStay() {
@@ -96,9 +96,6 @@ function addTotal(hand) {
   hand.forEach(card => {
     if (card[1] === 'A' && total > POINT_LIMIT) total -= 10;
   });
-  // hand.filter(value => value === 'A').forEach(_ => {
-  //   if (total > POINT_LIMIT) total -= 10;
-  // });
 
   return total;
 }
@@ -114,25 +111,25 @@ function playerTurn(deck, playerHand, dealerHand, playerPoints) {
     let answer = hitOrStay();
     if (answer === 'hit' || answer === 'h') {
       prompt('Player chose to hit!');
-      playerHand.push(dealCard(deck));
+      dealCard(deck, playerHand);
     } else if (answer === 'stay' || answer === 's') {
       prompt('Player chose to stay.');
       break;
     }
 
     playerPoints = addTotal(playerHand);
-    // if (playerPoints >= POINT_LIMIT) break;
+
   }
+  return playerPoints;
 }
 
 function dealerTurn(deck, dealerHand, dealerPoints) {
   while (dealerPoints < DEALER_HIT_LIMIT) {
     prompt('Dealer hit!');
-    dealerHand.push(dealCard(deck));
+    dealCard(deck, dealerHand);
     dealerPoints = addTotal(dealerHand);
-
-    // if (dealerPoints >= DEALER_HIT_LIMIT) break;
   }
+  return dealerPoints;
 }
 
 function displayFinalHands(playerHand, dealerHand) {
@@ -236,12 +233,13 @@ while (true) {
     playerTotal = addTotal(playerHand);
     dealerTotal = addTotal(dealerHand);
 
-    playerTurn(deckOfCards, playerHand, dealerHand, playerTotal);
+    playerTotal = playerTurn(deckOfCards, playerHand, dealerHand, playerTotal);
 
     if (busted(playerTotal)) {
       prompt('Player busted!');
     } else if (playerTotal < POINT_LIMIT) {
-      dealerTurn(deckOfCards, dealerHand, dealerTotal, playerTotal);
+      dealerTotal = dealerTurn(
+        deckOfCards, dealerHand, dealerTotal, playerTotal);
     }
 
     if (busted(dealerTotal)) {
