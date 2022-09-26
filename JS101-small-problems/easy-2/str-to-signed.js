@@ -44,4 +44,4 @@ function stringToSignedInteger(str) {
 }
 
 
-console.log(stringToSignedInteger('-571'));
+console.log(stringToSignedInteger('-571') === -571);
