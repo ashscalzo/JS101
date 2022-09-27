@@ -25,6 +25,7 @@ Data structures
   function to display number of years left?
     console.log()
   just lots of functions. all the functions.
+  consider edge cases! account for invalid input?
 
 Algorithm
   CONST readline
@@ -47,15 +48,21 @@ let yearsLeft;
 let currentYear = new Date().getFullYear();
 
 function getCurrentAge () {
-  return readline.question('How old are you? ');
+  return Number(readline.question('How old are you? '));
 }
 
 function getRetirementAge () {
-  return readline.question('At what age would you like to retire? ');
+  return Number(readline.question('At what age would you like to retire? '));
 }
 
 function calculateYearsLeft (userAge, userRetirement) {
   return userRetirement - userAge;
+}
+
+function invalidInput (value) {
+  return String(value).trimStart() === '' ||
+      Number.isNaN(value) ||
+      value <= 0;
 }
 
 function displayYearsLeft (years) {
@@ -64,7 +71,17 @@ function displayYearsLeft (years) {
 }
 
 currentAge = getCurrentAge();
+while (invalidInput(currentAge)) {
+  console.log('Invalid input. Please enter a valid number.');
+  currentAge = Number(readline.question());
+}
+
 retirementAge = getRetirementAge();
+while (invalidInput(retirementAge) || retirementAge < currentAge) {
+  console.log('Invalid input. Please enter a valid number.');
+  retirementAge = Number(readline.question());
+}
+
 yearsLeft = calculateYearsLeft(currentAge, retirementAge);
 
 displayYearsLeft(yearsLeft);
