@@ -10,7 +10,7 @@ Use the strict === operator to check origional arg with the reverse arr.
 return true if they are ===.
 */
 
-function isPalindrome(string) {
+function isPalindrome (string) {
   let reversedString = string.split('').reverse().join('');
   return reversedString === string;
 }
