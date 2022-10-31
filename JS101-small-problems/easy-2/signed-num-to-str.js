@@ -82,3 +82,29 @@ function signedIntToString (num) {
 console.log(signedIntToString(4321));
 console.log(signedIntToString(-123));
 console.log(signedIntToString(0));
+
+/* can also use the numToString function written in num-to-str.js as follows:
+
+function numToString (num) {
+  let numArray = [];
+  if (num === 0) return '0';
+  while (num > 0) {
+    let individualDigit = num % 10;
+    numArray.unshift(individualDigit);
+    num = (num - (num % 10)) / 10;
+  }
+  return numArray.join('');
+}
+
+function signedIntegerToString (num) {
+  switch (Math.sign(num)) {
+    case -1:
+      return `-${numToString(num)}`;
+    case 1:
+      return `+${numToString(num)}`;
+    default:
+      return numToString(num);
+  }
+}
+
+*/
