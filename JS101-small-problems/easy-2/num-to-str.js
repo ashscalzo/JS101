@@ -18,7 +18,6 @@ function numToString (num) {
   while (num > 0) {
     let individualDigit = num % 10;
     numArray.unshift(individualDigit);
-    console.log(numArray);
     num = (num - (num % 10)) / 10;
   }
   return numArray.join('');
