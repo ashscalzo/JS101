@@ -20,8 +20,8 @@ console.log(multiplyList([3, 5, 7], [9, 10, 11]));    // [27, 50, 77])
 function multLists (arr1, arr2) {
   let resultArr = [];
 
-  for (let i = 0; i < arr1.length; i += 1) {
-    resultArr.push(arr1[i] * arr2[i]);
+  for (let idx = 0; idx < arr1.length; idx += 1) {
+    resultArr.push(arr1[idx] * arr2[idx]);
   }
 
   return resultArr;
