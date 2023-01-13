@@ -42,4 +42,4 @@ function wordToDigit (string) {
 
 console.log(wordToDigit('Please call me at five five five one two three four. Thanks.'));  // "Please call me at 5 5 5 1 2 3 4. Thanks.")
 console.log(wordToDigit('I less than three you.'));   // 'I less than 3 you.'
-console.log(wordToDigit('This sentence ends with a one. This one ends with a five six seven eight.'));  // 'this sentence ends with a 1. This 1 ends with a 5 6 7 8.
+console.log(wordToDigit('This sentence ends with a one. This one ends with a five six seven eight.'));  // 'This sentence ends with a 1. This 1 ends with a 5 6 7 8.
